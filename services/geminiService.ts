@@ -1,7 +1,7 @@
 
 import { AspectRatio, GenerationResponse } from '../types';
 
-export const generateImage = async (prompt: string, apiKey: string, aspectRatio: AspectRatio): Promise<GenerationResponse> => {
+export const generateImage = async (prompt: string, aspectRatio: AspectRatio): Promise<GenerationResponse> => {
   try {
     const response = await fetch('/api/generate', {
       method: 'POST',
@@ -10,7 +10,6 @@ export const generateImage = async (prompt: string, apiKey: string, aspectRatio:
       },
       body: JSON.stringify({
         prompt,
-        apiKey,
         aspectRatio,
       }),
     });
