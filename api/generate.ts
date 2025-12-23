@@ -18,30 +18,34 @@ export default async function handler(req: any, res: any) {
   try {
     const { prompt, aspectRatio = '1:1', apiKey } = req.body;
 
-    // Use apiKey from request body first, then fallback to environment variable
-    const activeApiKey = apiKey || process.env.API_KEY;
+    // Use apiKey from request body
+    const activeApiKey = apiKey;
 
     if (!activeApiKey) {
       return res.status(400).json({ 
-        error: 'API Key is required. Please provide "apiKey" in the request body.' 
+        error: 'يرجى تقديم مفتاح الـ API (apiKey) في الطلب.' 
       });
     }
 
     if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' });
+      return res.status(400).json({ error: 'الوصف مطلوب لإتمام العملية' });
     }
 
     const ai = new GoogleGenAI({ apiKey: activeApiKey });
     
-    // 1. Optimize the prompt using Gemini Flash
-    const enhancementResponse = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: `You are an expert image prompt engineer. Translate and enhance the following description into a detailed, artistic English prompt for an AI image generator. Output only the enhanced prompt. Description: "${prompt}"`,
-    });
-    
-    const enhancedPrompt = enhancementResponse.text?.trim() || prompt;
+    // 1. Optimize the prompt using Gemini Flash (to translate and add artistic details)
+    let enhancedPrompt = prompt;
+    try {
+      const enhancementResponse = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `You are a professional image prompt engineer. Translate this user description to English if needed and enhance it with artistic details, lighting, and composition for a high-quality image generator. Output ONLY the enhanced prompt string. User Description: "${prompt}"`,
+      });
+      enhancedPrompt = enhancementResponse.text?.trim() || prompt;
+    } catch (e) {
+      console.error("Enhancement failed, using original prompt");
+    }
 
-    // 2. Generate the image
+    // 2. Generate the image using Gemini 2.5 Flash Image
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
@@ -58,7 +62,8 @@ export default async function handler(req: any, res: any) {
     
     if (!imagePart || !imagePart.inlineData) {
       return res.status(500).json({ 
-        error: 'The AI model did not return an image. Check your API key permissions and prompt content.',
+        success: false,
+        error: 'فشل الموديل في توليد الصورة. تأكد من أن المفتاح صحيح ويدعم توليد الصور.',
         details: response.text
       });
     }
@@ -72,7 +77,8 @@ export default async function handler(req: any, res: any) {
   } catch (error: any) {
     console.error("API Error:", error);
     return res.status(500).json({ 
-      error: 'An internal error occurred', 
+      success: false,
+      error: 'حدث خطأ في الخادم', 
       message: error.message 
     });
   }
