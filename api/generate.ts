@@ -58,13 +58,16 @@ export default async function handler(req: any, res: any) {
       },
     });
 
-    const imagePart = response.candidates?.[0]?.content?.parts.find((p: any) => p.inlineData);
+    const candidates = response.candidates || [];
+    const firstCandidate = candidates[0];
+    const parts = firstCandidate?.content?.parts || [];
+    const imagePart = parts.find((p: any) => p.inlineData);
     
     if (!imagePart || !imagePart.inlineData) {
       return res.status(500).json({ 
         success: false,
         error: 'فشل الموديل في توليد الصورة. تأكد من أن المفتاح صحيح ويدعم توليد الصور.',
-        details: response.text
+        details: response.text || 'لا توجد تفاصيل إضافية من الموديل'
       });
     }
 
