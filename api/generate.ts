@@ -16,14 +16,14 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { prompt, aspectRatio = '1:1', apiKey } = req.body;
+    const { prompt, aspectRatio = '1:1' } = req.body;
 
-    // Use apiKey from request body
-    const activeApiKey = apiKey;
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    const activeApiKey = process.env.API_KEY;
 
     if (!activeApiKey) {
-      return res.status(400).json({ 
-        error: 'يرجى تقديم مفتاح الـ API (apiKey) في الطلب.' 
+      return res.status(500).json({ 
+        error: 'لم يتم تكوين مفتاح الـ API في الخادم. يرجى مراجعة إعدادات البيئة.' 
       });
     }
 
@@ -33,7 +33,7 @@ export default async function handler(req: any, res: any) {
 
     const ai = new GoogleGenAI({ apiKey: activeApiKey });
     
-    // 1. Optimize the prompt using Gemini Flash (to translate and add artistic details)
+    // 1. Optimize the prompt using Gemini Flash
     let enhancedPrompt = prompt;
     try {
       const enhancementResponse = await ai.models.generateContent({
@@ -66,7 +66,7 @@ export default async function handler(req: any, res: any) {
     if (!imagePart || !imagePart.inlineData) {
       return res.status(500).json({ 
         success: false,
-        error: 'فشل الموديل في توليد الصورة. تأكد من أن المفتاح صحيح ويدعم توليد الصور.',
+        error: 'فشل الموديل في توليد الصورة. قد يكون الوصف مخالفاً للسياسات أو هناك خلل في الاتصال.',
         details: response.text || 'لا توجد تفاصيل إضافية من الموديل'
       });
     }
