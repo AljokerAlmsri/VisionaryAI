@@ -8,7 +8,6 @@ import { AspectRatio, GenerationResponse } from './types';
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerationResponse | null>(null);
@@ -26,16 +25,12 @@ const App: React.FC = () => {
       setError('يرجى كتابة وصف للمشهد أولاً');
       return;
     }
-    if (!apiKey.trim()) {
-      setError('يرجى إدخال مفتاح الـ API الخاص بك');
-      return;
-    }
 
     setError(null);
     setLoading(true);
     setResult(null);
 
-    const data = await generateImage(prompt, apiKey, aspectRatio);
+    const data = await generateImage(prompt, aspectRatio);
     
     setLoading(false);
     if (data.success) {
@@ -65,24 +60,6 @@ const App: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[100px] pointer-events-none"></div>
           
           <div className="space-y-8 relative">
-            {/* API Key Input */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest px-1 flex justify-between">
-                <span>مفتاح الـ API (Gemini)</span>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" className="text-indigo-400 hover:underline">احصل على مفتاح مجاني</a>
-              </label>
-              <div className="relative group">
-                <i className="fas fa-key absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 transition-colors"></i>
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="أدخل مفتاح الـ API الخاص بك هنا..."
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pr-12 pl-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-sm font-mono tracking-widest"
-                />
-              </div>
-            </div>
-
             {/* Prompt Input */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-widest px-1">وصف المشهد</label>
