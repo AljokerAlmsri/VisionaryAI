@@ -5,14 +5,14 @@ const ApiDocs: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const codeSnippet = `
-// إرسال طلب مع مفتاح الـ API الخاص بك
-const generateImage = async (userPrompt, userApiKey) => {
+// مثال لإرسال طلب توليد صورة بمفتاحك الخاص
+const generate = async () => {
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
-      prompt: userPrompt,
-      apiKey: userApiKey, // أرسل المفتاح هنا مباشرة
+      prompt: "رائد فضاء في الغابة",
+      apiKey: "YOUR_GEMINI_API_KEY", // مفتاحك هنا
       aspectRatio: '16:9' 
     })
   });
@@ -20,8 +20,6 @@ const generateImage = async (userPrompt, userApiKey) => {
   const data = await response.json();
   if (data.success) {
     console.log("Image URL:", data.imageUrl);
-  } else {
-    console.error("Error:", data.error);
   }
 };`;
 
@@ -32,25 +30,22 @@ const generateImage = async (userPrompt, userApiKey) => {
   };
 
   return (
-    <div className="glass-card p-8 rounded-3xl border-white/10 mt-12 overflow-hidden relative">
+    <div className="glass-card p-8 rounded-3xl border-white/10 mt-20 overflow-hidden relative">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold flex items-center gap-3">
-          <i className="fas fa-key text-indigo-400"></i>
-          استخدام الـ API بمفتاحك الخاص
+        <h3 className="text-xl font-bold flex items-center gap-3">
+          <i className="fas fa-code text-indigo-400"></i>
+          استخدام الـ API للمطورين
         </h3>
-        <span className="bg-indigo-500/20 text-indigo-400 text-xs px-3 py-1 rounded-full border border-indigo-500/20">تحديث: دعم المفاتيح الخارجية</span>
+        <span className="bg-indigo-500/20 text-indigo-400 text-[10px] px-2 py-1 rounded-full border border-indigo-500/20 uppercase font-black">SDK v1.0</span>
       </div>
 
-      <div className="space-y-6 text-gray-300 leading-relaxed">
-        <p>
-          لقد قمنا بتحديث الـ API ليدعم استقبال <strong>apiKey</strong> مباشرة في جسم الطلب (Request Body). 
-          هذا يتيح لك بناء تطبيقاتك الخاصة دون الحاجة لتخزين المفتاح في خوادم Vercel.
-        </p>
+      <div className="space-y-4 text-gray-400 text-sm leading-relaxed">
+        <p>يمكنك دمج محرك الصور الخاص بنا في تطبيقاتك الخاصة عبر إرسال الطلبات مباشرة إلى هذا الـ Endpoint:</p>
         
-        <div className="bg-slate-900/80 rounded-xl p-4 font-mono text-sm border border-white/5 flex flex-col gap-2">
+        <div className="bg-black/50 rounded-xl p-4 font-mono text-xs border border-white/5 flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-gray-500">Endpoint:</span>
-            <code className="text-indigo-300">POST /api/generate</code>
+            <code className="text-indigo-300">/api/generate</code>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-500">Method:</span>
@@ -67,20 +62,9 @@ const generateImage = async (userPrompt, userApiKey) => {
               <i className={`fas ${copied ? 'fa-check text-green-400' : 'fa-copy'}`}></i>
             </button>
           </div>
-          <pre className="bg-slate-950 p-6 rounded-2xl overflow-x-auto border border-white/5 text-sm leading-relaxed text-indigo-100 font-mono">
+          <pre className="bg-slate-950/80 p-5 rounded-2xl overflow-x-auto border border-white/5 text-xs text-indigo-100 font-mono" dir="ltr">
             {codeSnippet}
           </pre>
-        </div>
-
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-4">
-          <i className="fas fa-shield-halved text-amber-500 mt-1"></i>
-          <div>
-            <h4 className="text-amber-500 font-bold text-sm mb-1">نصيحة أمنية</h4>
-            <p className="text-xs text-gray-400 leading-normal">
-              إذا كنت ستستخدم الـ API في تطبيق "Front-end" عام، يرجى الحذر من تسريب مفتاح الـ API الخاص بك. 
-              يُفضل دائماً استدعاء هذا الـ API من خادم خلفي (Back-end) خاص بك لحماية مفاتيحك.
-            </p>
-          </div>
         </div>
       </div>
     </div>
